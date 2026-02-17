@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Interactive Calculator</title>
+	<link rel="stylesheet" href="./styles.css">
+	<script src="./script.js" defer></script>
+</head>
+
+<body>
+	<main class="calculator-card">
+		<h1>Interactive Calculator</h1>
+
+		<form id="calculator-form" class="calculator-form">
+			<div class="input-group">
+				<label for="num1">First Number</label>
+				<input id="num1" type="number" step="any" placeholder="Enter first number" required>
+			</div>
+
+			<div class="input-group">
+				<label for="operation">Operation</label>
+				<select id="operation" required>
+					<option value="+">Addition (+)</option>
+					<option value="-">Subtraction (-)</option>
+					<option value="*">Multiplication (×)</option>
+					<option value="/">Division (÷)</option>
+				</select>
+			</div>
+
+			<div class="input-group">
+				<label for="num2">Second Number</label>
+				<input id="num2" type="number" step="any" placeholder="Enter second number" required>
+			</div>
+
+			<button type="submit" id="calculate-btn">Calculate</button>
+		</form>
+
+		<section id="result-box" class="result-box neutral">
+			<h2>Result</h2>
+			<p id="result-value">0</p>
+			<p id="result-message" class="result-message">Enter values and click Calculate.</p>
+		</section>
+	</main>
+</body>
+
+</html>
