@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 4: Unique Course Registration</title>
+    <style>
+        :root { --bg: linear-gradient(135deg, #0ea5e9, #8b5cf6); --panel: #0f172a; --text: #e2e8f0; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; padding: 24px; margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); display: grid; place-items: center; }
+        .card { width: min(760px, 100%); background: rgba(15, 23, 42, 0.92); border-radius: 16px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); }
+        h1 { margin-top: 0; letter-spacing: -0.4px; }
+        .inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 10px; margin-bottom: 12px; }
+        input { padding: 12px; border-radius: 10px; border: 1px solid #1e293b; background: #0b1224; color: var(--text); }
+        button { padding: 12px; border: none; border-radius: 10px; background: #10b981; color: #0b1224; font-weight: 700; cursor: pointer; box-shadow: 0 12px 26px rgba(16,185,129,0.35); }
+        .ghost { background: #1f2937; color: #e5e7eb; box-shadow: none; border: 1px solid #2d3748; }
+        .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+        .pill { background: rgba(255,255,255,0.08); padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.08); }
+        .count { font-size: 14px; color: #cbd5e1; }
+        .message { margin-top: 8px; font-weight: 700; }
+        .error { color: #f87171; }
+        .success { color: #34d399; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Course Registration</h1>
+        <div class="inputs">
+            <input type="text" id="courseInput" placeholder="Enter course name">
+            <button id="addBtn">Add Course</button>
+            <button id="sampleBtn" class="ghost">Add Sample Set</button>
+            <button id="clearBtn" class="ghost">Clear All</button>
+        </div>
+        <div class="count">Registered Courses: <span id="count">0</span></div>
+        <div id="message" class="message"></div>
+        <div id="courseList" class="pill-row"></div>
+    </div>
+
+    <script>
+        const registeredCourses = new Set();
+        const courseInput = document.getElementById('courseInput');
+        const messageDiv = document.getElementById('message');
+        const courseList = document.getElementById('courseList');
+        const countSpan = document.getElementById('count');
+
+        function addCourse(name) {
+            const courseName = (name || courseInput.value).trim();
+            messageDiv.textContent = '';
+            messageDiv.className = 'message';
+            if (!courseName) return;
+            if (registeredCourses.has(courseName)) {
+                messageDiv.textContent = `Duplicate: ${courseName}`;
+                messageDiv.classList.add('error');
+            } else {
+                registeredCourses.add(courseName);
+                messageDiv.textContent = `Added: ${courseName}`;
+                messageDiv.classList.add('success');
+                courseInput.value = '';
+                renderCourses();
+            }
+        }
+
+        function renderCourses() {
+            courseList.innerHTML = '';
+            countSpan.textContent = registeredCourses.size;
+            for (const course of registeredCourses) {
+                const pill = document.createElement('div');
+                pill.className = 'pill';
+                pill.textContent = course;
+                pill.dataset.value = course;
+                courseList.appendChild(pill);
+            }
+        }
+
+        courseList.addEventListener('click', e => {
+            const value = e.target.dataset.value;
+            if (value) {
+                registeredCourses.delete(value);
+                renderCourses();
+            }
+        });
+
+        document.getElementById('addBtn').addEventListener('click', () => addCourse());
+        document.getElementById('sampleBtn').addEventListener('click', () => {
+            addCourse('Data Structures');
+            addCourse('Web Engineering');
+            addCourse('Operating Systems');
+        });
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            registeredCourses.clear();
+            renderCourses();
+            messageDiv.textContent = '';
+        });
+
+        registeredCourses.add("Introduction to Programming");
+        renderCourses();
+    </script>
+</body>
+</html>

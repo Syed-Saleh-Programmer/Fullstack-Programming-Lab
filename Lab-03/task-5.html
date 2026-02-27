@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 5: Product Catalog (Map)</title>
+    <style>
+        :root { --bg: #0f172a; --panel: #0b1220; --accent: #6366f1; --text: #e2e8f0; --muted: #94a3b8; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 26px; background: radial-gradient(circle at 15% 20%, rgba(99,102,241,0.16), transparent 30%), var(--bg); color: var(--text); }
+        h1 { letter-spacing: -0.5px; }
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; background: var(--panel); padding: 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 16px 32px rgba(0,0,0,0.2); }
+        input, select { padding: 12px; border-radius: 10px; border: 1px solid #1f2937; background: #0f172a; color: var(--text); }
+        button { padding: 12px; border: none; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #14b8a6); color: white; font-weight: 700; cursor: pointer; box-shadow: 0 12px 28px rgba(99,102,241,0.35); }
+        button.delete { background: #ef4444; box-shadow: 0 12px 24px rgba(239,68,68,0.3); }
+        .product-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 18px; }
+        .product-card { border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 14px; background: #0b1220; box-shadow: 0 12px 30px rgba(0,0,0,0.25); transition: transform 0.1s ease, box-shadow 0.2s ease; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(0,0,0,0.3); }
+        .price { font-weight: 800; color: #f59e0b; }
+        .tag { display: inline-block; padding: 6px 10px; border-radius: 999px; background: rgba(99,102,241,0.15); color: #c7d2fe; font-size: 12px; margin-top: 6px; }
+        .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .muted { color: var(--muted); font-size: 13px; }
+        .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 14px; }
+    </style>
+</head>
+<body>
+    <h1>Product Catalog</h1>
+    
+    <div class="controls">
+        <input type="number" id="id" placeholder="ID">
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="category" placeholder="Category">
+        <input type="number" step="0.01" id="price" placeholder="Price">
+        <button id="add">Add / Update</button>
+        <input type="text" id="search" placeholder="Search name or category">
+        <select id="sort">
+            <option value="id">Sort by ID</option>
+            <option value="price">Sort by Price</option>
+            <option value="name">Sort by Name</option>
+        </select>
+        <button id="delete" class="delete">Delete by ID</button>
+        <div id="searchResult" class="muted"></div>
+    </div>
+
+    <div class="split">
+        <div class="muted">Total Products: <span id="totalProducts">0</span></div>
+        <div class="muted">Tip: Click a card to copy its ID.</div>
+    </div>
+    <div id="catalog" class="product-list"></div>
+
+    <script>
+        const productMap = new Map();
+
+        productMap.set(101, { name: "Wireless Mouse", category: "Electronics", price: 25.99 });
+        productMap.set(102, { name: "Mechanical Keyboard", category: "Electronics", price: 89.5 });
+        productMap.set(103, { name: "Gaming Monitor", category: "Electronics", price: 299 });
+        productMap.set(104, { name: "Ergonomic Chair", category: "Furniture", price: 150 });
+        productMap.set(105, { name: "USB-C Hub", category: "Accessories", price: 45 });
+
+        const catalogDiv = document.getElementById('catalog');
+        const searchResultDiv = document.getElementById('searchResult');
+        const totalSpan = document.getElementById('totalProducts');
+        const sortSelect = document.getElementById('sort');
+        const searchInput = document.getElementById('search');
+
+        function renderCatalog() {
+            const term = searchInput.value.toLowerCase();
+            const sorted = Array.from(productMap.entries()).sort((a, b) => {
+                if (sortSelect.value === 'price') return a[1].price - b[1].price;
+                if (sortSelect.value === 'name') return a[1].name.localeCompare(b[1].name);
+                return a[0] - b[0];
+            }).filter(([_, p]) => p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term));
+
+            catalogDiv.innerHTML = '';
+            totalSpan.textContent = sorted.length;
+
+            sorted.forEach(([id, product]) => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <div class="row" style="justify-content: space-between;">
+                        <h3 style="margin:0;">${product.name}</h3>
+                        <span class="tag">${product.category}</span>
+                    </div>
+                    <p class="muted">ID: ${id}</p>
+                    <p class="price">$${product.price.toFixed(2)}</p>
+                `;
+                card.addEventListener('click', () => {
+                    navigator.clipboard.writeText(id.toString());
+                    searchResultDiv.textContent = `Copied ID ${id}`;
+                });
+                catalogDiv.appendChild(card);
+            });
+        }
+
+        document.getElementById('add').addEventListener('click', () => {
+            const id = parseInt(document.getElementById('id').value);
+            const name = document.getElementById('name').value.trim();
+            const category = document.getElementById('category').value.trim();
+            const price = parseFloat(document.getElementById('price').value);
+            if (!id || !name || !category || isNaN(price)) return;
+            productMap.set(id, { name, category, price });
+            searchResultDiv.textContent = `Saved product ${name}`;
+            renderCatalog();
+        });
+
+        document.getElementById('delete').addEventListener('click', () => {
+            const id = parseInt(document.getElementById('id').value);
+            if (productMap.has(id)) {
+                const name = productMap.get(id).name;
+                productMap.delete(id);
+                searchResultDiv.textContent = `Deleted ${name}`;
+                renderCatalog();
+            } else {
+                searchResultDiv.textContent = `ID ${id} not found`;
+            }
+        });
+
+        searchInput.addEventListener('input', renderCatalog);
+        sortSelect.addEventListener('change', renderCatalog);
+
+        renderCatalog();
+    </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 1: Student Management System</title>
+    <style>
+        :root {
+            --bg: radial-gradient(circle at 20% 20%, #e0f4ff, #f5f7fb 45%, #ffffff);
+            --card: #ffffffcc;
+            --accent: #2563eb;
+            --text: #0f172a;
+            --muted: #475569;
+            --shadow: 0 15px 40px rgba(37, 99, 235, 0.15);
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 32px;
+            color: var(--text);
+        }
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 28px;
+            border-radius: 18px;
+            backdrop-filter: blur(6px);
+            box-shadow: var(--shadow);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+        .controls { display: grid; gap: 12px; margin-bottom: 18px; }
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 10px;
+        }
+        .input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: white;
+        }
+        .button-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+        }
+        button:hover { transform: translateY(-1px); }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+        }
+        .student-card {
+            border: 1px solid #e2e8f0;
+            padding: 18px;
+            border-radius: 14px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+        }
+        .student-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #e0f2fe;
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .muted { color: var(--muted); margin: 6px 0; }
+        .pill-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .pill { padding: 6px 10px; background: #eef2ff; color: #312e81; border-radius: 999px; font-size: 12px; }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .search-filter { display: flex; gap: 10px; flex-wrap: wrap; }
+        select { padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; }
+        .empty { text-align: center; color: var(--muted); padding: 24px; }
+        @media (max-width: 768px) {
+            body { padding: 16px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .search-filter { width: 100%; }
+            .search-filter input, .search-filter select { width: 100%; }
+            .input-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Student Management System</h1>
+            <div class="search-filter">
+                <input type="text" id="search" placeholder="Search name or course" aria-label="Search students">
+                <select id="semesterFilter" aria-label="Filter by semester">
+                    <option value="all">All Semesters</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
+                    <option value="6">Semester 6</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="input-grid">
+                <div class="input-group">
+                    <input type="number" id="id" placeholder="ID">
+                    <input type="text" id="name" placeholder="Name">
+                </div>
+                <div class="input-group">
+                    <input type="number" id="semester" placeholder="Semester">
+                    <input type="text" id="courses" placeholder="Courses (comma separated)">
+                </div>
+            </div>
+            <div class="button-row">
+                <button id="addBtn">Add Student</button>
+                <button id="shuffleBtn">Shuffle Order</button>
+            </div>
+        </div>
+
+        <div id="student-list" class="grid"></div>
+        <div id="empty" class="empty" style="display:none;">No students found.</div>
+    </div>
+
+    <script>
+        class Student {
+            constructor(id, name, semester, courses) {
+                this.id = id;
+                this.name = name;
+                this.semester = semester;
+                this.courses = courses;
+            }
+        }
+
+        const students = [
+            new Student(101, "Alice Johnson", 3, ["Math", "Physics", "Chemistry"]),
+            new Student(102, "Bob Smith", 5, ["Computer Science", "Algorithms", "Databases"]),
+            new Student(103, "Charlie Brown", 2, ["History", "English", "Psychology"])
+        ];
+
+        const studentListContainer = document.getElementById('student-list');
+        const emptyState = document.getElementById('empty');
+        const searchInput = document.getElementById('search');
+        const semesterFilter = document.getElementById('semesterFilter');
+        const addBtn = document.getElementById('addBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+
+        function render(list) {
+            if (!list.length) {
+                studentListContainer.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            emptyState.style.display = 'none';
+            studentListContainer.innerHTML = list.map(student => {
+                const coursePills = student.courses.map(c => `<span class="pill">${c}</span>`).join('');
+                return `
+                    <div class="student-card">
+                        <div class="badge">Semester ${student.semester}</div>
+                        <h3>${student.name}</h3>
+                        <p class="muted">ID: ${student.id}</p>
+                        <div class="pill-list">${coursePills}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterStudents() {
+            const term = searchInput.value.toLowerCase();
+            const sem = semesterFilter.value;
+            const filtered = students.filter(s => {
+                const matchesTerm = s.name.toLowerCase().includes(term) || s.courses.some(c => c.toLowerCase().includes(term));
+                const matchesSem = sem === 'all' || String(s.semester) === sem;
+                return matchesTerm && matchesSem;
+            });
+            render(filtered);
+        }
+
+        function addStudent() {
+            const id = parseInt(document.getElementById('id').value);
+            const name = document.getElementById('name').value.trim();
+            const semester = parseInt(document.getElementById('semester').value);
+            const coursesRaw = document.getElementById('courses').value;
+            if (!id || !name || !semester) return;
+            if (students.some(s => s.id === id)) return;
+            const courses = coursesRaw ? coursesRaw.split(',').map(c => c.trim()).filter(Boolean) : [];
+            students.push(new Student(id, name, semester, courses.length ? courses : ["TBD"]));
+            clearInputs();
+            filterStudents();
+        }
+
+        function clearInputs() {
+            document.getElementById('id').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('semester').value = '';
+            document.getElementById('courses').value = '';
+        }
+
+        function shuffle() {
+            for (let i = students.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [students[i], students[j]] = [students[j], students[i]];
+            }
+            filterStudents();
+        }
+
+        searchInput.addEventListener('input', filterStudents);
+        semesterFilter.addEventListener('change', filterStudents);
+        addBtn.addEventListener('click', addStudent);
+        shuffleBtn.addEventListener('click', shuffle);
+
+        render(students);
+    </script>
+</body>
+</html>
