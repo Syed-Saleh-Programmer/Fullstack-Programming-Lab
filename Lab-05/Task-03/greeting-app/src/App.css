@@ -1,0 +1,76 @@
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: 12px;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.title {
+  font-size: clamp(28px, 4vw, 36px);
+  margin: 0;
+  color: #e2e8f0;
+}
+
+.lede {
+  margin: 0;
+  color: #cbd5e1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.greeting-card {
+  border-radius: 16px;
+  padding: 18px;
+  color: #0b1220;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.greeting-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
+}
+
+.card-kicker {
+  margin: 0 0 4px;
+  text-transform: capitalize;
+  font-weight: 600;
+  color: rgba(11, 18, 32, 0.8);
+}
+
+.card-title {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+
+.card-name {
+  font-weight: 700;
+}
+
+.card-copy {
+  margin: 6px 0 0;
+  color: rgba(11, 18, 32, 0.78);
+}
