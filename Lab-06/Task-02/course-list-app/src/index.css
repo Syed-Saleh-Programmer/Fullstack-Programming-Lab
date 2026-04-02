@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Subtle page-wide styling */
+body {
+	@apply bg-slate-950 text-slate-50 font-sans antialiased;
+}
+
+#root {
+	@apply min-h-screen;
+}
